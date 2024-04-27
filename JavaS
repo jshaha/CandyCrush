@@ -1,0 +1,93 @@
+const boardSize = 8;
+let gameBoard = [];
+let dragStartIndex = null;
+
+const candyColors = [
+    'url("images/red-candy.png")',
+    'url("images/blue-candy.png")',
+    'url("images/green-candy.png")',
+    'url("images/yellow-candy.png")',
+    'url("images/purple-candy.png")',
+    'url("images/orange-candy.png")'
+];
+
+function initializeBoard() {
+    for (let i = 0; i < boardSize; i++) {
+        gameBoard[i] = [];
+        for (let j = 0; j < boardSize; j++) {
+            gameBoard[i][j] = candyColors[Math.floor(Math.random() * candyColors.length)];
+        }
+    }
+}
+
+function drawBoard() {
+    const boardElement = document.getElementById('gameBoard');
+    boardElement.innerHTML = '';
+    gameBoard.forEach((row, i) => {
+        row.forEach((candy, j) => {
+            const tileElement = document.createElement('div');
+            tileElement.style.backgroundImage = candy;
+            tileElement.setAttribute('data-index', i * boardSize + j);
+            tileElement.className = 'tile';
+            tileElement.draggable = true;
+            attachDragHandlers(tileElement);
+            boardElement.appendChild(tileElement);
+        });
+    });
+}
+
+function attachDragHandlers(element) {
+    element.addEventListener('dragstart', dragStart);
+    element.addEventListener('dragover', dragOver);
+    element.addEventListener('dragenter', dragEnter);
+    element.addEventListener('dragleave', dragLeave);
+    element.addEventListener('drop', dragDrop);
+    element.addEventListener('dragend', dragEnd);
+}
+
+function dragStart(e) {
+    dragStartIndex = parseInt(e.target.getAttribute('data-index'));
+}
+
+function dragOver(e) {
+    e.preventDefault();
+}
+
+function dragEnter(e) {
+    e.preventDefault();
+}
+
+function dragLeave(e) {
+    e.preventDefault();
+}
+
+function dragDrop(e) {
+    const dragEndIndex = parseInt(e.target.getAttribute('data-index'));
+    swapTiles(dragStartIndex, dragEndIndex);
+}
+
+function dragEnd(e) {
+    checkForMatches();
+}
+
+function swapTiles(fromIndex, toIndex) {
+    const temp = gameBoard[Math.floor(fromIndex / boardSize)][fromIndex % boardSize];
+    gameBoard[Math.floor(fromIndex / boardSize)][fromIndex % boardSize] = gameBoard[Math.floor(toIndex / boardSize)][toIndex % boardSize];
+    gameBoard[Math.floor(toIndex / boardSize)][toIndex % boardSize] = temp;
+    drawBoard();
+}
+
+function checkForMatches() {
+    // Add logic to check for three or more matching candies in a row or column
+    // Clear matches and shift candies down
+    // Refill the board with new candies if necessary
+}
+
+function resetGame() {
+    initializeBoard();
+    drawBoard();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    resetGame();
+});
